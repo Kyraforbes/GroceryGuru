@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .habit-form {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .habit-list {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .habit-item {
+            border-bottom: 1px solid #eee;
+            padding: 10px 0;
+        }
+        input[type="text"], select {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Habit Tracker</h1>
+    
+    <div class="habit-form">
+        <h2>Add New Habit</h2>
+        <form id="habitForm">
+            <label for="habitName">Habit Name:</label><br>
+            <input type="text" id="habitName" name="habitName" placeholder="e.g., Daily Exercise"><br><br>
+            
+            <label for="description">Description:</label><br>
+            <input type="text" id="description" name="description" placeholder="e.g., 30 minutes of cardio"><br><br>
+            
+            <label for="frequency">Target Days Per Week:</label><br>
+            <select id="frequency" name="frequency">
+                <option value="1">1 day</option>
+                <option value="2">2 days</option>
+                <option value="3">3 days</option>
+                <option value="4">4 days</option>
+                <option value="5">5 days</option>
+                <option value="6">6 days</option>
+                <option value="7">7 days</option>
+            </select><br><br>
+            
+            <button type="button" onclick="submitHabit()">Add Habit</button>
+        </form>
+    </div>
+
+    <div class="habit-list">
+        <h2>My Habits</h2>
+        <div id="habitsList">
+            <!-- Habits will be added here dynamically -->
+        </div>
+    </div>
+
+    <script>
+        // Array to store habits
+        let habits = [];
+
+        function submitHabit() {
+            const habitName = document.getElementById('habitName').value;
+            const description = document.getElementById('description').value;
+            const frequency = document.getElementById('frequency').value;
+
+            if (!habitName) {
+                alert('Please enter a habit name');
+                return;
+            }
+
+            // Create new habit object
+            const habit = {
+                name: habitName,
+                description: description,
+                frequency: frequency,
+                dateCreated: new Date().toLocaleDateString()
+            };
+
+            // Add to habits array
+            habits.push(habit);
+
+            // Update display
+            displayHabits();
+
+            // Clear form
+            document.getElementById('habitForm').reset();
+        }
+
+        function displayHabits() {
+            const habitsList = document.getElementById('habitsList');
+            habitsList.innerHTML = ''; // Clear current list
+
+            habits.forEach((habit, index) => {
+                const habitElement = document.createElement('div');
+                habitElement.className = 'habit-item';
+                habitElement.innerHTML = `
+                    <h3>${habit.name}</h3>
+                    <p>${habit.description}</p>
+                    <p>Target: ${habit.frequency} days per week</p>
+                    <p>Created: ${habit.dateCreated}</p>
+                    <button onclick="markCompleted(${index})">Mark Today Complete</button>
+                    <button onclick="deleteHabit(${index})" style="background-color: #ff4444;">Delete</button>
+                `;
+                habitsList.appendChild(habitElement);
+            });
+        }
+
+        function deleteHabit(index) {
+            habits.splice(index, 1);
+            displayHabits();
+        }
+
+        function markCompleted(index) {
+            alert(`Marked "${habits[index].name}" as completed for today!`);
+        }
+    </script>
+</body>
+</html>

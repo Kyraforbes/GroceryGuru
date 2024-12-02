@@ -1,0 +1,25 @@
+2024-11-23 21:47:15.644 [info] 
+
+
+
+
+2024-11-23 21:47:15.661 [info] Extension host agent started.
+2024-11-23 21:47:15.692 [info] Started initializing default profile extensions in extensions installation folder. file:///home/ubuntu/.local/share/code-server/extensions
+2024-11-23 21:47:15.707 [info] Completed initializing default profile extensions in extensions installation folder. file:///home/ubuntu/.local/share/code-server/extensions
+2024-11-23 21:47:34.778 [info] [<unknown>][cde23b50][ManagementConnection] New connection established.
+2024-11-23 21:47:38.850 [info] [<unknown>][d4ffd18c][ExtensionHostConnection] New connection established.
+2024-11-23 21:47:38.906 [info] [<unknown>][d4ffd18c][ExtensionHostConnection] <13279> Launched Extension Host Process.
+2024-11-23 21:47:39.334 [error] Error: Unexpected SIGPIPE
+    at process.<anonymous> (file:///var/app/code-server/lib/vscode/out/server-main.js:187:1327)
+    at process.emit (node:events:531:35)
+2024-11-24 03:04:44.630 [info] [<unknown>][d4ffd18c][ExtensionHostConnection] The client has reconnected.
+2024-11-24 03:04:44.854 [info] [<unknown>][cde23b50][ManagementConnection] The client has disconnected, will wait for reconnection 3h before disposing...
+2024-11-24 03:04:45.619 [info] [<unknown>][cde23b50][ManagementConnection] Another client has connected, will shorten the wait for reconnection 5m before disposing...
+2024-11-24 03:04:45.619 [info] [<unknown>][cde23b50][ManagementConnection] The client has reconnected.
+2024-11-24 03:53:36.509 [warning] No ptyHost heartbeat after 6 seconds
+2024-11-24 03:53:37.595 [info] [<unknown>][d4ffd18c][ExtensionHostConnection] The client has reconnected.
+2024-11-24 03:53:38.022 [info] [<unknown>][cde23b50][ManagementConnection] The client has reconnected.
+2024-11-24 03:53:40.466 [info] [<unknown>][ad6c9212][ManagementConnection] New connection established.
+2024-11-24 03:53:43.906 [info] [<unknown>][dfb303ed][ExtensionHostConnection] New connection established.
+2024-11-24 03:53:43.966 [info] [<unknown>][dfb303ed][ExtensionHostConnection] <101860> Launched Extension Host Process.
+2024-11-24 03:54:06.131 [info] [<unknown>][ad6c9212][ManagementConnection] The client has disconnected gracefully, so the connection will be disposed.

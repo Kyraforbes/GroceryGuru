@@ -1,0 +1,10 @@
+2024-11-24 04:25:12.129 [info] 
+
+
+
+
+2024-11-24 04:25:12.149 [info] Extension host agent started.
+2024-11-24 04:25:17.939 [info] [<unknown>][3f32adf4][ManagementConnection] New connection established.
+2024-11-24 04:25:21.119 [info] [<unknown>][2122802e][ExtensionHostConnection] New connection established.
+2024-11-24 04:25:21.204 [info] [<unknown>][2122802e][ExtensionHostConnection] <2019> Launched Extension Host Process.
+2024-11-24 08:26:50.919 [info] [<unknown>][3f32adf4][ManagementConnection] The client has disconnected, will wait for reconnection 3h before disposing...

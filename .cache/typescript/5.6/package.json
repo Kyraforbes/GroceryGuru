@@ -1,0 +1,1 @@
+{"private":true,"dependencies":{"types-registry":"^0.1.696"},"devDependencies":{"@types/babel__core":"^7.20.5","@types/progress":"^2.0.7","@types/react":"^18.3.12","@types/react-dom":"^18.3.1","@types/react-native-dotenv":"^0.2.2","@types/react-native-web":"^0.19.0"}}

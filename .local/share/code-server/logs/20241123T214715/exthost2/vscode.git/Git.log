@@ -1,0 +1,82 @@
+2024-11-24 03:53:47.910 [info] [main] Log level: Info
+2024-11-24 03:53:47.910 [info] [main] Validating found git in: "git"
+2024-11-24 03:53:47.910 [info] [main] Using git "2.43.0" from "git"
+2024-11-24 03:53:47.910 [info] [Model][doInitialScan] Initial repository scan started
+2024-11-24 03:53:47.910 [info] > git rev-parse --show-toplevel [11ms]
+2024-11-24 03:53:47.910 [info] fatal: not a git repository (or any of the parent directories): .git
+2024-11-24 03:53:47.910 [info] > git rev-parse --show-toplevel [3ms]
+2024-11-24 03:53:47.910 [info] fatal: not a git repository (or any of the parent directories): .git
+2024-11-24 03:53:47.910 [info] > git rev-parse --show-toplevel [2ms]
+2024-11-24 03:53:47.910 [info] fatal: not a git repository (or any of the parent directories): .git
+2024-11-24 03:53:47.910 [info] > git rev-parse --show-toplevel [1ms]
+2024-11-24 03:53:47.910 [info] fatal: not a git repository (or any of the parent directories): .git
+2024-11-24 03:53:47.910 [info] > git rev-parse --show-toplevel [1ms]
+2024-11-24 03:53:47.910 [info] fatal: not a git repository (or any of the parent directories): .git
+2024-11-24 03:53:47.910 [info] > git rev-parse --show-toplevel [0ms]
+2024-11-24 03:53:47.910 [info] fatal: not a git repository (or any of the parent directories): .git
+2024-11-24 03:53:47.910 [info] > git rev-parse --show-toplevel [15ms]
+2024-11-24 03:53:47.910 [info] fatal: not a git repository (or any of the parent directories): .git
+2024-11-24 03:53:47.910 [info] > git rev-parse --show-toplevel [19ms]
+2024-11-24 03:53:47.910 [info] > git rev-parse --git-dir --git-common-dir [4ms]
+2024-11-24 03:53:47.910 [info] [Model][openRepository] Opened repository: /home/ubuntu/HabitTrackerDjango
+2024-11-24 03:53:47.910 [info] > git config --get commit.template [6ms]
+2024-11-24 03:53:47.915 [info] > git rev-parse --show-toplevel [9ms]
+2024-11-24 03:53:47.932 [info] > git for-each-ref --format=%(refname)%00%(upstream:short)%00%(objectname)%00%(upstream:track)%00%(upstream:remotename)%00%(upstream:remoteref) refs/heads/master refs/remotes/master [19ms]
+2024-11-24 03:53:47.936 [warning] [Git][revParse] Unable to read file: ENOENT: no such file or directory, open '/home/ubuntu/HabitTrackerDjango/.git/refs/remotes/origin/master'
+2024-11-24 03:53:47.937 [info] > git rev-parse --git-dir --git-common-dir [7ms]
+2024-11-24 03:53:47.944 [info] [Model][openRepository] Opened repository: /home/ubuntu/HabitTrackerExpo
+2024-11-24 03:53:47.953 [info] > git rev-parse refs/remotes/origin/master [17ms]
+2024-11-24 03:53:47.971 [info] > git rev-parse --show-toplevel [19ms]
+2024-11-24 03:53:47.971 [info] > git config --get commit.template [22ms]
+2024-11-24 03:53:47.976 [info] > git for-each-ref --sort -committerdate --format %(refname) %(objectname) %(*objectname) [10ms]
+2024-11-24 03:53:47.985 [info] > git status -z -uall [26ms]
+2024-11-24 03:53:47.985 [info] > git rev-parse --git-dir --git-common-dir [10ms]
+2024-11-24 03:53:47.989 [info] [Model][openRepository] Opened repository: /home/ubuntu/ec2_scripts
+2024-11-24 03:53:48.003 [info] [Model][doInitialScan] Initial repository scan completed - repositories (3), closed repositories (0), parent repositories (0), unsafe repositories (0)
+2024-11-24 03:53:48.079 [info] > git for-each-ref --format=%(refname)%00%(upstream:short)%00%(objectname)%00%(upstream:track)%00%(upstream:remotename)%00%(upstream:remoteref) refs/heads/master refs/remotes/master [63ms]
+2024-11-24 03:53:48.083 [info] > git for-each-ref --format=%(refname)%00%(upstream:short)%00%(objectname)%00%(upstream:track)%00%(upstream:remotename)%00%(upstream:remoteref) refs/heads/master refs/remotes/master [101ms]
+2024-11-24 03:53:48.087 [warning] [Git][revParse] Unable to read file: ENOENT: no such file or directory, open '/home/ubuntu/HabitTrackerExpo/.git/refs/remotes/origin/master'
+2024-11-24 03:53:48.088 [info] > git config --local branch.master.vscode-merge-base [5ms]
+2024-11-24 03:53:48.092 [info] > git config --get commit.template [14ms]
+2024-11-24 03:53:48.092 [info] > git config --get commit.template [17ms]
+2024-11-24 03:53:48.095 [info] > git for-each-ref --format=%(refname)%00%(upstream:short)%00%(objectname)%00%(upstream:track)%00%(upstream:remotename)%00%(upstream:remoteref) refs/heads/origin/master refs/remotes/origin/master [3ms]
+2024-11-24 03:53:48.101 [info] > git rev-parse refs/remotes/origin/master [14ms]
+2024-11-24 03:53:48.118 [info] > git merge-base refs/heads/master refs/remotes/origin/master [19ms]
+2024-11-24 03:53:48.123 [info] > git status -z -uall [18ms]
+2024-11-24 03:53:48.124 [info] > git for-each-ref --format=%(refname)%00%(upstream:short)%00%(objectname)%00%(upstream:track)%00%(upstream:remotename)%00%(upstream:remoteref) refs/heads/master refs/remotes/master [6ms]
+2024-11-24 03:53:48.127 [info] > git for-each-ref --sort -committerdate --format %(refname) %(objectname) %(*objectname) [18ms]
+2024-11-24 03:53:48.140 [warning] [Git][revParse] Unable to read file: ENOENT: no such file or directory, open '/home/ubuntu/HabitTrackerDjango/.git/refs/remotes/origin/master'
+2024-11-24 03:53:48.147 [info] > git for-each-ref --format=%(refname)%00%(upstream:short)%00%(objectname)%00%(upstream:track)%00%(upstream:remotename)%00%(upstream:remoteref) refs/heads/master refs/remotes/master [13ms]
+2024-11-24 03:53:48.152 [info] > git for-each-ref --format=%(refname)%00%(upstream:short)%00%(objectname)%00%(upstream:track)%00%(upstream:remotename)%00%(upstream:remoteref) refs/heads/master refs/remotes/master [37ms]
+2024-11-24 03:53:48.152 [info] > git diff --name-status -z --diff-filter=ADMR 7fc4ee2e594fcdba1a7e7076085e380abeb619f4...refs/remotes/origin/master [30ms]
+2024-11-24 03:53:48.156 [warning] [Git][revParse] Unable to read file: ENOENT: no such file or directory, open '/home/ubuntu/ec2_scripts/.git/refs/remotes/origin/master'
+2024-11-24 03:53:48.156 [info] > git config --local branch.master.vscode-merge-base [4ms]
+2024-11-24 03:53:48.161 [info] > git config --get commit.template [18ms]
+2024-11-24 03:53:48.162 [info] > git rev-parse refs/remotes/origin/master [22ms]
+2024-11-24 03:53:48.171 [info] > git status -z -uall [6ms]
+2024-11-24 03:53:48.173 [info] > git for-each-ref --format=%(refname)%00%(upstream:short)%00%(objectname)%00%(upstream:track)%00%(upstream:remotename)%00%(upstream:remoteref) refs/heads/origin/master refs/remotes/origin/master [11ms]
+2024-11-24 03:53:48.175 [info] > git rev-parse refs/remotes/origin/master [19ms]
+2024-11-24 03:53:48.186 [info] > git status -z -uall [7ms]
+2024-11-24 03:53:48.187 [info] > git merge-base refs/heads/master refs/remotes/origin/master [12ms]
+2024-11-24 03:53:48.190 [info] > git for-each-ref --sort -committerdate --format %(refname) %(objectname) %(*objectname) [21ms]
+2024-11-24 03:53:48.196 [info] > git diff --name-status -z --diff-filter=ADMR 770f00fa091c6a1d709d80cfac8c21a00c1d7230...refs/remotes/origin/master [6ms]
+2024-11-24 03:53:48.197 [info] > git for-each-ref --format=%(refname)%00%(upstream:short)%00%(objectname)%00%(upstream:track)%00%(upstream:remotename)%00%(upstream:remoteref) refs/heads/master refs/remotes/master [13ms]
+2024-11-24 03:53:48.197 [info] > git for-each-ref --sort -committerdate --format %(refname) %(objectname) %(*objectname) [15ms]
+2024-11-24 03:53:48.208 [warning] [Git][revParse] Unable to read file: ENOENT: no such file or directory, open '/home/ubuntu/HabitTrackerExpo/.git/refs/remotes/origin/master'
+2024-11-24 03:53:48.215 [info] > git for-each-ref --format=%(refname)%00%(upstream:short)%00%(objectname)%00%(upstream:track)%00%(upstream:remotename)%00%(upstream:remoteref) refs/heads/master refs/remotes/master [11ms]
+2024-11-24 03:53:48.221 [info] > git config --get commit.template [9ms]
+2024-11-24 03:53:48.221 [info] > git rev-parse refs/remotes/origin/master [13ms]
+2024-11-24 03:53:48.259 [info] > git status -z -uall [35ms]
+2024-11-24 03:53:48.259 [info] > git config --local branch.master.vscode-merge-base [40ms]
+2024-11-24 03:53:48.275 [info] > git for-each-ref --format=%(refname)%00%(upstream:short)%00%(objectname)%00%(upstream:track)%00%(upstream:remotename)%00%(upstream:remoteref) refs/heads/origin/master refs/remotes/origin/master [12ms]
+2024-11-24 03:53:48.280 [info] > git for-each-ref --sort -committerdate --format %(refname) %(objectname) %(*objectname) [53ms]
+2024-11-24 03:53:48.324 [info] > git merge-base refs/heads/master refs/remotes/origin/master [44ms]
+2024-11-24 03:53:48.331 [info] > git for-each-ref --format=%(refname)%00%(upstream:short)%00%(objectname)%00%(upstream:track)%00%(upstream:remotename)%00%(upstream:remoteref) refs/heads/master refs/remotes/master [60ms]
+2024-11-24 03:53:48.341 [warning] [Git][revParse] Unable to read file: ENOENT: no such file or directory, open '/home/ubuntu/ec2_scripts/.git/refs/remotes/origin/master'
+2024-11-24 03:53:48.345 [info] > git diff --name-status -z --diff-filter=ADMR 49126d879cf67c4458fbdbd4b565eee2fb0f0b00...refs/remotes/origin/master [14ms]
+2024-11-24 03:53:48.351 [info] > git rev-parse refs/remotes/origin/master [10ms]
+2024-11-24 03:53:48.378 [info] > git status -z -uall [16ms]
+2024-11-24 03:53:48.401 [info] > git for-each-ref --sort -committerdate --format %(refname) %(objectname) %(*objectname) [27ms]
+2024-11-24 03:53:48.862 [info] > git check-ignore -v -z --stdin [10ms]
+2024-11-24 03:53:48.863 [info] > git check-ignore -v -z --stdin [6ms]
+2024-11-24 03:53:48.863 [info] > git check-ignore -v -z --stdin [4ms]

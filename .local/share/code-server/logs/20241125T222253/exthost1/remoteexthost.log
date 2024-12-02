@@ -1,0 +1,19 @@
+2024-11-25 22:23:05.920 [info] Extension host with pid 9302 started
+2024-11-25 22:23:05.920 [error] Error: EEXIST: file already exists, open '/home/ubuntu/.local/share/code-server/User/workspaceStorage/386bef2e/vscode.lock'
+2024-11-25 22:23:05.936 [info] Lock '/home/ubuntu/.local/share/code-server/User/workspaceStorage/386bef2e/vscode.lock': Could not acquire lock, checking if the file is stale.
+2024-11-25 22:23:05.982 [info] Lock '/home/ubuntu/.local/share/code-server/User/workspaceStorage/386bef2e/vscode.lock': The pid 2267 appears to be gone.
+2024-11-25 22:23:05.982 [info] Lock '/home/ubuntu/.local/share/code-server/User/workspaceStorage/386bef2e/vscode.lock': Deleting a stale lock.
+2024-11-25 22:23:06.033 [info] Lock '/home/ubuntu/.local/share/code-server/User/workspaceStorage/386bef2e/vscode.lock': Lock acquired.
+2024-11-25 22:23:07.013 [info] ExtensionService#_doActivateExtension vscode.emmet, startup: false, activationEvent: 'onLanguage'
+2024-11-25 22:23:07.224 [info] ExtensionService#_doActivateExtension vscode.tunnel-forwarding, startup: false, activationEvent: 'onTunnel'
+2024-11-25 22:23:07.749 [info] ExtensionService#_doActivateExtension vscode.git-base, startup: true, activationEvent: '*', root cause: vscode.git
+2024-11-25 22:23:07.819 [info] ExtensionService#_doActivateExtension vscode.npm, startup: true, activationEvent: 'workspaceContains:package.json'
+2024-11-25 22:23:08.586 [info] ExtensionService#_doActivateExtension vscode.git, startup: true, activationEvent: '*'
+2024-11-25 22:23:08.587 [info] ExtensionService#_doActivateExtension vscode.github, startup: true, activationEvent: '*'
+2024-11-25 22:23:09.687 [info] Eager extensions activated
+2024-11-25 22:23:09.688 [info] ExtensionService#_doActivateExtension vscode.debug-auto-launch, startup: false, activationEvent: 'onStartupFinished'
+2024-11-25 22:23:09.690 [info] ExtensionService#_doActivateExtension vscode.merge-conflict, startup: false, activationEvent: 'onStartupFinished'
+2024-11-25 22:23:12.449 [info] ExtensionService#_doActivateExtension vscode.github-authentication, startup: false, activationEvent: 'onAuthenticationRequest:github'
+2024-11-25 22:23:15.318 [info] ExtensionService#_doActivateExtension vscode.configuration-editing, startup: false, activationEvent: 'onLanguage:json'
+2024-11-25 22:23:15.320 [info] ExtensionService#_doActivateExtension vscode.extension-editing, startup: false, activationEvent: 'onLanguage:json'
+2024-11-25 22:23:15.337 [info] ExtensionService#_doActivateExtension vscode.json-language-features, startup: false, activationEvent: 'onLanguage:json'

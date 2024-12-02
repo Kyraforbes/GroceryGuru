@@ -1,0 +1,12 @@
+2024-11-25 22:03:17.785 [info] 
+
+
+
+
+2024-11-25 22:03:17.804 [info] Extension host agent started.
+2024-11-25 22:03:39.309 [info] [<unknown>][cf796a39][ManagementConnection] New connection established.
+2024-11-25 22:03:44.193 [info] [<unknown>][83b57dbd][ExtensionHostConnection] New connection established.
+2024-11-25 22:03:44.231 [info] [<unknown>][83b57dbd][ExtensionHostConnection] <2267> Launched Extension Host Process.
+2024-11-25 22:03:44.345 [error] Error: Unexpected SIGPIPE
+    at process.<anonymous> (file:///var/app/code-server/lib/vscode/out/server-main.js:187:1327)
+    at process.emit (node:events:531:35)
