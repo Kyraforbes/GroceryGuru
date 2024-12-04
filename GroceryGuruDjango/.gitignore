@@ -1,0 +1,104 @@
+# Python bytecode files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django specific
+*.log
+*.pot
+*.pyc
+*.pyo
+*.sqlite3
+db.sqlite3
+
+# If you're using an SQLite database
+*.db
+
+# Django migrations
+**/migrations/*
+
+# Static files
+staticfiles/
+static/
+media/
+
+# Local development environment settings
+.env
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# If using cloud9
+.c9/
+
+# Python virtual environment
+venv/
+env/
+ENV/
+.venv/
+
+# Python egg files
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+*.log
+*.pdf
+*.dvi
+*.ps
+*.rpyc
+*.pyo
+*.pyc
+*.swp
+.coverage
+.cache
+.pytest_cache/
+
+# Jupyter Notebook files
+.ipynb_checkpoints
+
+# Distribution / packaging
+.Python
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+
+# Celery task queue files
+celerybeat-schedule
+celerybeat.pid
+
+# Sphinx documentation
+docs/_build/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# MacOS specific
+.DS_Store
+
+# Cloud9 specific
+*.c9/
+*.pid
+
+# If you use coverage
+.coverage
+htmlcov/
+
+# Pyre type checker
+.pyre/

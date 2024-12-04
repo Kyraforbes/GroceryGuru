@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .habit-form {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .habit-list {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .habit-item {
+            border-bottom: 1px solid #eee;
+            padding: 10px 0;
+        }
+        input[type="text"], 
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Habit Tracker</h1>
+    
+    <div class="habit-form">
+        <h2>Add New Habit</h2>
+        <form id="habitForm">
+            <label for="habitName">Habit Name:</label><br>
+            <input type="text" id="habitName" name="habitName" placeholder="e.g., Drink Water, Exercise" required><br><br>
+            
+            <label for="amountPerDay">Amount Per Day:</label><br>
+            <input type="number" id="amountPerDay" name="amountPerDay" placeholder="e.g., 64 oz water or 30 min exercise" required><br><br>
+            
+            <label for="targetDays">Target Days Per Week:</label><br>
+            <input type="number" id="targetDays" name="targetDays" min="1" max="7" value="7"><br><br>
+            
+            <button type="button" onclick="submitHabit()">Add Habit</button>
+        </form>
+    </div>
+
+    <div class="habit-list">
+        <h2>My Habits</h2>
+        <div id="habitsList">
+            <!-- Habits will be added here dynamically -->
+        </div>
+    </div>
+
+    <script>
+        let habits = [];
+
+        async function loadHabits() {
+            try {
+                const response = await fetch('/api/habits/');
+                const data = await response.json();
+                habits = data.habits;
+                displayHabits();
+            } catch (error) {
+                console.error('Error loading habits:', error);
+            }
+        }
+
+        async function submitHabit() {
+            const habitName = document.getElementById('habitName').value;
+            const amountPerDay = document.getElementById('amountPerDay').value;
+            const targetDays = document.getElementById('targetDays').value;
+
+            if (!habitName || !amountPerDay) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/habits/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: habitName,
+                        amount_per_day: parseInt(amountPerDay),
+                        target_days_per_week: parseInt(targetDays)
+                    })
+                });
+
+                if (response.ok) {
+                    const newHabit = await response.json();
+                    habits.push(newHabit);
+                    displayHabits();
+                    document.getElementById('habitForm').reset();
+                } else {
+                    alert('Error adding habit');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error adding habit');
+            }
+        }
+
+        function displayHabits() {
+            const habitsList = document.getElementById('habitsList');
+            habitsList.innerHTML = '';
+
+            habits.forEach((habit) => {
+                const habitElement = document.createElement('div');
+                habitElement.className = 'habit-item';
+                habitElement.innerHTML = `
+                    <h3>${habit.name}</h3>
+                    <p>Daily Goal: ${habit.amount_per_day}</p>
+                    <p>Target: ${habit.target_days_per_week} days/week</p>
+                    <div class="habit-log">
+                        <button onclick="markCompleted(${habit.id})">Mark Complete</button>
+                        <button onclick="deleteHabit(${habit.id})" style="background-color: #ff4444;">Delete</button>
+                    </div>
+                `;
+                habitsList.appendChild(habitElement);
+            });
+        }
+
+        async function markCompleted(habitId) {
+            try {
+                const response = await fetch(`/api/habits/${habitId}/log/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        completed: true
+                    })
+                });
+                if (response.ok) {
+                    alert('Habit marked as completed for today!');
+                } else {
+                    alert('Error updating habit');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error updating habit');
+            }
+        }
+
+        async function deleteHabit(habitId) {
+            if (!confirm('Are you sure you want to delete this habit?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/habits/${habitId}/`, {
+                    method: 'DELETE'
+                });
+                if (response.ok) {
+                    habits = habits.filter(h => h.id !== habitId);
+                    displayHabits();
+                } else {
+                    alert('Error deleting habit');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error deleting habit');
+            }
+        }
+
+        // Load habits when page loads
+        document.addEventListener('DOMContentLoaded', loadHabits);
+    </script>
+</body>
+</html>
