@@ -1,9 +1,9 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
-from rest_framework.decorators import action
+from rest_framework.decorators import action, permission_classes
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, logout
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from .models import UserProfile, MealPlan, Meal, ShoppingList, ShoppingListItem
@@ -18,6 +18,8 @@ class RegistrationView(APIView):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
+            # Create a UserProfile instance for the new user
+            UserProfile.objects.create(user=user)
             token, _ = Token.objects.get_or_create(user=user)
             return Response({
                 'token': token.key,
@@ -44,6 +46,21 @@ class LoginView(APIView):
         return Response({
             'error': 'Invalid credentials'
         }, status=status.HTTP_401_UNAUTHORIZED)
+
+class LogoutView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        try:
+            # Delete the user's token
+            request.user.auth_token.delete()
+            # Logout the user
+            logout(request)
+            return Response({'message': 'Successfully logged out'}, 
+                          status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, 
+                          status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     serializer_class = UserProfileSerializer

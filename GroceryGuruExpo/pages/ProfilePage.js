@@ -8,9 +8,11 @@ import {
   Platform,
   TouchableOpacity,
   Alert,
+  ScrollView,
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { profileService } from '../services/api';
+import { colors } from '../constants/colors';
 
 export default function ProfilePage() {
   const [ageGroupOpen, setAgeGroupOpen] = useState(false);
@@ -47,7 +49,6 @@ export default function ProfilePage() {
   const [allergies, setAllergies] = useState('');
   const [otherPreferences, setOtherPreferences] = useState('');
 
-  // Load profile data when component mounts
   useEffect(() => {
     loadProfile();
   }, []);
@@ -57,7 +58,7 @@ export default function ProfilePage() {
       setIsLoading(true);
       const response = await profileService.getProfile();
       const profile = response.data;
-      
+
       setAgeGroup(profile.age_group);
       setShoppingFrequency(profile.shopping_frequency);
       setEatingOutFrequency(profile.eating_out_frequency);
@@ -105,83 +106,79 @@ export default function ProfilePage() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, styles.centerContent]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <Text style={styles.heading}>Profile</Text>
+      <ScrollView style={styles.scrollContainer}>
+        <Text style={styles.heading}>Profile</Text>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Your preferences:</Text>
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Your preferences:</Text>
 
-        {/* Allergies Input */}
-        <Text style={styles.label}>Allergies:</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Type your allergies here"
-          value={allergies}
-          onChangeText={setAllergies}
-        />
+          <Text style={styles.label}>Allergies:</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Type your allergies here"
+            value={allergies}
+            onChangeText={setAllergies}
+          />
 
-        {/* Age Group Dropdown */}
-        <Text style={styles.label}>Age Group:</Text>
-        <DropDownPicker
-          open={ageGroupOpen}
-          value={ageGroup}
-          items={ageGroupItems}
-          setOpen={setAgeGroupOpen}
-          setValue={setAgeGroup}
-          style={styles.dropdown}
-          placeholder="Select age group"
-          zIndex={3000}
-          zIndexInverse={1000}
-        />
+          <Text style={styles.label}>Age Group:</Text>
+          <DropDownPicker
+            open={ageGroupOpen}
+            value={ageGroup}
+            items={ageGroupItems}
+            setOpen={setAgeGroupOpen}
+            setValue={setAgeGroup}
+            style={styles.dropdown}
+            placeholder="Select age group"
+            zIndex={3000}
+            zIndexInverse={1000}
+          />
 
-        {/* Shopping Frequency Dropdown */}
-        <Text style={styles.label}>Shopping Frequency:</Text>
-        <DropDownPicker
-          open={shoppingFrequencyOpen}
-          value={shoppingFrequency}
-          items={shoppingFrequencyItems}
-          setOpen={setShoppingFrequencyOpen}
-          setValue={setShoppingFrequency}
-          style={styles.dropdown}
-          placeholder="How often do you go shopping?"
-          zIndex={2000}
-          zIndexInverse={2000}
-        />
+          <Text style={styles.label}>Shopping Frequency:</Text>
+          <DropDownPicker
+            open={shoppingFrequencyOpen}
+            value={shoppingFrequency}
+            items={shoppingFrequencyItems}
+            setOpen={setShoppingFrequencyOpen}
+            setValue={setShoppingFrequency}
+            style={styles.dropdown}
+            placeholder="How often do you go shopping?"
+            zIndex={2000}
+            zIndexInverse={2000}
+          />
 
-        {/* Eating Out Frequency Dropdown */}
-        <Text style={styles.label}>Eating Out Frequency:</Text>
-        <DropDownPicker
-          open={eatingOutFrequencyOpen}
-          value={eatingOutFrequency}
-          items={eatingOutFrequencyItems}
-          setOpen={setEatingOutFrequencyOpen}
-          setValue={setEatingOutFrequency}
-          style={styles.dropdown}
-          placeholder="How often do you eat out?"
-          zIndex={1000}
-          zIndexInverse={3000}
-        />
+          <Text style={styles.label}>Eating Out Frequency:</Text>
+          <DropDownPicker
+            open={eatingOutFrequencyOpen}
+            value={eatingOutFrequency}
+            items={eatingOutFrequencyItems}
+            setOpen={setEatingOutFrequencyOpen}
+            setValue={setEatingOutFrequency}
+            style={styles.dropdown}
+            placeholder="How often do you eat out?"
+            zIndex={1000}
+            zIndexInverse={3000}
+          />
 
-        {/* Other Preferences Input */}
-        <Text style={styles.label}>Other Preferences:</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Type any other dietary restrictions/preferences here"
-          value={otherPreferences}
-          onChangeText={setOtherPreferences}
-          multiline
-        />
+          <Text style={styles.label}>Other Preferences:</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Type any other dietary restrictions/preferences here"
+            value={otherPreferences}
+            onChangeText={setOtherPreferences}
+            multiline
+          />
 
-        {/* Save Button */}
-        <TouchableOpacity 
-          style={styles.saveButton}
-          onPress={handleSaveProfile}
-        >
-          <Text style={styles.saveButtonText}>Save Profile</Text>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity
+            style={styles.saveButton}
+            onPress={handleSaveProfile}
+          >
+            <Text style={styles.saveButtonText}>Save Profile</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
@@ -189,19 +186,25 @@ export default function ProfilePage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
+    backgroundColor: colors.white,
     padding: 20,
+  },
+  centerContent: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  scrollContainer: {
+    width: '100%',
+    maxWidth: 400,
   },
   heading: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: '#4CAF50',
+    color: colors.primary,
     marginBottom: 10,
   },
   card: {
-    backgroundColor: '#DFF0D8',
+    backgroundColor: colors.primaryLight,
     width: '100%',
     maxWidth: 400,
     padding: 20,
@@ -217,31 +220,32 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
     marginBottom: 20,
+    color: colors.primaryDark,
   },
   label: {
     fontSize: 16,
     marginBottom: 5,
-    color: '#333',
+    color: colors.text,
   },
   input: {
     height: 40,
-    borderColor: '#ccc',
+    borderColor: colors.border,
     borderWidth: 1,
     borderRadius: 5,
     marginBottom: 15,
     paddingLeft: 10,
     width: '100%',
-    backgroundColor: '#fff',
+    backgroundColor: colors.white,
   },
   dropdown: {
-    borderColor: '#ccc',
+    borderColor: colors.border,
     borderRadius: 5,
     marginBottom: 15,
     width: '100%',
-    backgroundColor: '#fff',
+    backgroundColor: colors.white,
   },
   saveButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: colors.primary,
     padding: 15,
     borderRadius: 5,
     width: '100%',
@@ -249,7 +253,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   saveButtonText: {
-    color: '#fff',
+    color: colors.white,
     fontSize: 16,
     fontWeight: 'bold',
   },

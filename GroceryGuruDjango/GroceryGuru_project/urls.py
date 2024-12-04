@@ -21,4 +21,5 @@ from django.views.generic import RedirectView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('GroceryGuru_app.urls')),
+    path('', RedirectView.as_view(url='/api/')),
 ]

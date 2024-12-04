@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import RecipeCard from '../components/RecipeCard';
+import { colors } from '../constants/colors';
 
 export default function MyMeals() {
   const [expanded, setExpanded] = useState({
@@ -56,8 +57,8 @@ export default function MyMeals() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#F7B888" />
-        <Text>Loading Recipes...</Text>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={styles.loadingText}>Loading Recipes...</Text>
       </View>
     );
   }
@@ -73,11 +74,13 @@ export default function MyMeals() {
         {Object.keys(recipes).map((category) => (
           <View key={category} style={styles.category}>
             <TouchableOpacity
-              style={styles.categoryButton}
+              style={[styles.categoryButton, expanded[category] && styles.categoryButtonActive]}
               onPress={() => toggleCategory(category)}
             >
-              <Text style={styles.categoryText}>{category}</Text>
-              <Text style={styles.dropdownIcon}>
+              <Text style={[styles.categoryText, expanded[category] && styles.categoryTextActive]}>
+                {category}
+              </Text>
+              <Text style={[styles.dropdownIcon, expanded[category] && styles.dropdownIconActive]}>
                 {expanded[category] ? '▲' : '▼'}
               </Text>
             </TouchableOpacity>
@@ -103,17 +106,18 @@ export default function MyMeals() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF6ED',
+    backgroundColor: colors.white,
+    padding: 20,
   },
   header: {
-    backgroundColor: '#F7B888',
+    backgroundColor: colors.primary,
     padding: 20,
     alignItems: 'center',
   },
   headerText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#000',
+    color: colors.white,
   },
   categories: {
     padding: 20,
@@ -125,17 +129,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#F6EDE3',
+    backgroundColor: colors.primaryLight,
     padding: 15,
     borderRadius: 10,
+  },
+  categoryButtonActive: {
+    backgroundColor: colors.primary,
   },
   categoryText: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: colors.text,
+  },
+  categoryTextActive: {
+    color: colors.white,
   },
   dropdownIcon: {
     fontSize: 16,
-    color: '#888',
+    color: colors.textLight,
+  },
+  dropdownIconActive: {
+    color: colors.white,
   },
   recipeList: {
     marginTop: 10,
@@ -144,6 +158,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FFF6ED',
+    backgroundColor: colors.white,
+  },
+  loadingText: {
+    marginTop: 10,
+    color: colors.primary,
+    fontSize: 16,
   },
 });
