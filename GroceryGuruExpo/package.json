@@ -1,7 +1,7 @@
 {
   "name": "grocery_guru",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -13,6 +13,7 @@
     "@react-native-picker/picker": "^2.10.1",
     "@react-navigation/drawer": "^7.0.2",
     "@react-navigation/native": "^7.0.1",
+    "axios": "^1.7.8",
     "expo": "~52.0.5",
     "expo-status-bar": "~2.0.0",
     "react": "18.3.1",

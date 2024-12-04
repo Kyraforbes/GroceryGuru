@@ -1,9 +1,13 @@
 import axios from 'axios';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://your-api-url:8000';
+// Use your EC2 instance's public IP or domain
+const API_URL = process.env.EXPO_PUBLIC_API_URL || `http://${process.env.EXPO_PUBLIC_PUBLIC_IP}:8000`;
 
 const api = axios.create({
     baseURL: API_URL,
+    headers: {
+        'Content-Type': 'application/json',
+    },
 });
 
 export const profileService = {

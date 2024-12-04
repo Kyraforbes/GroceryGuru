@@ -1,4 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
+import { mealPlanService } from '../services/api';
 
 export default function MealPlan() {
   return (
