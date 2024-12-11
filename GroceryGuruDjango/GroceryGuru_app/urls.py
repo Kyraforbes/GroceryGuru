@@ -1,7 +1,8 @@
-from django.urls import path
+from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from . import views
 from rest_framework.authtoken.views import obtain_auth_token
+from django.views.generic import RedirectView
 
 router = DefaultRouter()
 router.register(r'profile', views.UserProfileViewSet, basename='profile')
@@ -24,16 +25,12 @@ urlpatterns = [
 
     # User registration and auth endpoints
     path('register/',
-         views.RegistrationView.as_view(),
+         views.register_view,
          name='register'),
 
-    path('login/',
-         views.LoginView.as_view(),
-         name='login'),
+    path('login/', views.login_view, name='login'),
 
-    path('logout/',
-         views.LogoutView.as_view(),
-         name='logout'),
+    path('logout/', views.logout_view, name='logout'),
 
     path('api/token/',
          obtain_auth_token,

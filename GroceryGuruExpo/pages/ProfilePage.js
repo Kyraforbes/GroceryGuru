@@ -14,6 +14,36 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import { profileService } from '../services/api';
 import { colors } from '../constants/colors';
 
+// Separate component for the submitted profile view
+const SubmittedProfilePage = ({ profile, onEdit }) => {
+  return (
+    <ScrollView style={styles.container}>
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Your Profile</Text>
+
+        <Text style={styles.label}>Age Group: {profile.age_group}</Text>
+        <Text style={styles.label}>
+          Shopping Frequency: {profile.shopping_frequency}
+        </Text>
+        <Text style={styles.label}>
+          Eating Out Frequency: {profile.eating_out_frequency}
+        </Text>
+        <Text style={styles.label}>Allergies: {profile.allergies}</Text>
+        <Text style={styles.label}>
+          Other Preferences: {profile.other_preferences}
+        </Text>
+
+        <TouchableOpacity
+          style={styles.editButton}
+          onPress={onEdit}
+        >
+          <Text style={styles.editButtonText}>Edit</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
+  );
+};
+
 export default function ProfilePage() {
   const [ageGroupOpen, setAgeGroupOpen] = useState(false);
   const [shoppingFrequencyOpen, setShoppingFrequencyOpen] = useState(false);
@@ -40,14 +70,17 @@ export default function ProfilePage() {
   ]);
 
   const [eatingOutFrequencyItems] = useState([
-    { label: 'Daily', value: 'daily' },
-    { label: 'Weekly', value: 'weekly' },
-    { label: 'Bi-weekly', value: 'bi_weekly' },
-    { label: 'Monthly', value: 'monthly' },
+    { label: '1 time per week', value: '1_per_week' },
+    { label: '2 times per week', value: '2_per_week' },
+    { label: '3 times per week', value: '3_per_week' },
+    { label: '4 times per week', value: '4_per_week' },
+    { label: '5 or more times per week', value: '5_plus_per_week' },
   ]);
 
   const [allergies, setAllergies] = useState('');
   const [otherPreferences, setOtherPreferences] = useState('');
+  const [isProfileSubmitted, setIsProfileSubmitted] = useState(false);
+  const [submittedProfile, setSubmittedProfile] = useState(null);
 
   useEffect(() => {
     loadProfile();
@@ -83,7 +116,8 @@ export default function ProfilePage() {
       };
 
       await profileService.updateProfile(profileData);
-      Alert.alert('Success', 'Profile updated successfully');
+      setSubmittedProfile(profileData);
+      setIsProfileSubmitted(true);
     } catch (error) {
       console.error('Error saving profile:', error);
       Alert.alert('Error', 'Failed to save profile data');
@@ -101,6 +135,15 @@ export default function ProfilePage() {
       <View style={styles.container}>
         <Text>Loading profile...</Text>
       </View>
+    );
+  }
+
+  if (isProfileSubmitted && submittedProfile) {
+    return (
+      <SubmittedProfilePage
+        profile={submittedProfile}
+        onEdit={() => setIsProfileSubmitted(false)}
+      />
     );
   }
 
@@ -157,7 +200,7 @@ export default function ProfilePage() {
             setOpen={setEatingOutFrequencyOpen}
             setValue={setEatingOutFrequency}
             style={styles.dropdown}
-            placeholder="How often do you eat out?"
+            placeholder="How many times per week do you eat out?"
             zIndex={1000}
             zIndexInverse={3000}
           />
@@ -253,6 +296,19 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   saveButtonText: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  editButton: {
+    backgroundColor: colors.primary,
+    padding: 15,
+    borderRadius: 5,
+    width: '100%',
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  editButtonText: {
     color: colors.white,
     fontSize: 16,
     fontWeight: 'bold',

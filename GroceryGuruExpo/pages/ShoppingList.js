@@ -9,7 +9,6 @@ import {
   ScrollView,
   FlatList,
 } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
 import { colors } from '../constants/colors';
 import { mealPlanService, shoppingListService } from '../services/api';
 
@@ -50,7 +49,7 @@ export default function ShoppingList() {
       try {
         const newItem = { text: customItem, isChecked: false };
         const response = await shoppingListService.addItem(newItem);
-        setShoppingList(prev => [...prev, response.data]);
+        setShoppingList((prev) => [...prev, response.data]);
         setCustomItem('');
         setIsModalVisible(false);
       } catch (error) {
@@ -62,33 +61,31 @@ export default function ShoppingList() {
   };
 
   const toggleMealSelection = (mealId) => {
-    setSelectedMeals(prev => {
+    setSelectedMeals((prev) => {
       if (prev.includes(mealId)) {
-        return prev.filter(id => id !== mealId);
+        return prev.filter((id) => id !== mealId);
       }
       return [...prev, mealId];
     });
   };
 
-  const addMealsToList = () => {
-    // Add ingredients from selected meals to shopping list
-    const newItems = selectedMeals.flatMap(mealId => {
-      const meal = availableMeals.find(m => m.id === mealId);
-      return meal.ingredients.map(ingredient => ({
-        text: ingredient,
-        isChecked: false
-      }));
-    });
-
-    shoppingListService.addItemsFromMeal(newItems)
-      .then(() => {
-        loadShoppingList();
-        setSelectedMeals([]);
-        setMealSelectionVisible(false);
-      })
-      .catch(error => {
-        console.error('Error adding items from meals:', error);
+  const addMealsToList = async () => {
+    try {
+      const newItems = selectedMeals.flatMap((mealId) => {
+        const meal = availableMeals.find((m) => m.id === mealId);
+        return meal.ingredients.map((ingredient) => ({
+          text: ingredient,
+          isChecked: false,
+        }));
       });
+
+      await shoppingListService.addItemsFromMeal(newItems);
+      setShoppingList((prev) => [...prev, ...newItems]);
+      setSelectedMeals([]);
+      setMealSelectionVisible(false);
+    } catch (error) {
+      console.error('Error adding items from meals:', error);
+    }
   };
 
   const MealSelectionModal = () => (
@@ -107,17 +104,17 @@ export default function ShoppingList() {
               <TouchableOpacity
                 style={[
                   styles.mealItem,
-                  selectedMeals.includes(item.id) && styles.selectedMealItem
+                  selectedMeals.includes(item.id) && styles.selectedMealItem,
                 ]}
                 onPress={() => toggleMealSelection(item.id)}
               >
                 <Text style={styles.mealText}>{item.name}</Text>
                 {selectedMeals.includes(item.id) && (
-                  <MaterialIcons name="check" size={24} color={colors.primary} />
+                  <Text style={styles.checkIcon}>✓</Text>
                 )}
               </TouchableOpacity>
             )}
-            keyExtractor={item => item.id.toString()}
+            keyExtractor={(item) => item.id.toString()}
           />
           <View style={styles.modalButtons}>
             <TouchableOpacity
@@ -138,9 +135,37 @@ export default function ShoppingList() {
     </Modal>
   );
 
+  const toggleItemChecked = async (index) => {
+    try {
+      const item = shoppingList[index];
+      const response = await shoppingListService.toggleItem(item.id);
+      if (response.status === 200) {
+        setShoppingList(prevList => {
+          const newList = [...prevList];
+          newList[index] = { ...newList[index], isChecked: !newList[index].isChecked };
+          return newList;
+        });
+      }
+    } catch (error) {
+      console.error('Error toggling item:', error);
+      Alert.alert('Error', 'Failed to update item status');
+    }
+  };
   
+  const handleItemRemoval = async (index) => {
+    try {
+      const item = shoppingList[index];
+      const response = await shoppingListService.removeItem(item.id);
+      if (response.status === 204) {
+        setShoppingList(prevList => prevList.filter((_, i) => i !== index));
+      }
+    } catch (error) {
+      console.error('Error removing item:', error);
+      Alert.alert('Error', 'Failed to remove item');
+    }
+  };
 
-  return (
+return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.heading}>Shopping List</Text>
 
@@ -152,7 +177,7 @@ export default function ShoppingList() {
         <Text style={styles.cardTitle}>
           Selected Meals ({selectedMeals.length})
         </Text>
-        <MaterialIcons name="add" size={24} color={colors.white} />
+        <Text style={styles.iconText}>+</Text>
       </TouchableOpacity>
 
       {/* Add Custom Item Button */}
@@ -161,7 +186,7 @@ export default function ShoppingList() {
         onPress={() => setIsModalVisible(true)}
       >
         <Text style={styles.cardTitle}>Add Custom Item</Text>
-        <MaterialIcons name="add" size={24} color={colors.white} />
+        <Text style={styles.iconText}>+</Text>
       </TouchableOpacity>
 
       {/* Shopping List */}
@@ -175,18 +200,18 @@ export default function ShoppingList() {
                 <TouchableOpacity
                   style={[
                     styles.checkbox,
-                    item.isChecked && styles.checkboxChecked
+                    item.isChecked && styles.checkboxChecked,
                   ]}
                   onPress={() => toggleItemChecked(index)}
                 >
                   {item.isChecked && (
-                    <MaterialIcons name="check" size={18} color={colors.primary} />
+                    <Text style={styles.checkIcon}>✓</Text>
                   )}
                 </TouchableOpacity>
                 <Text
                   style={[
                     styles.listItemText,
-                    item.isChecked && styles.listItemChecked
+                    item.isChecked && styles.listItemChecked,
                   ]}
                 >
                   {item.text}
@@ -195,7 +220,7 @@ export default function ShoppingList() {
                   style={styles.modifyListButton}
                   onPress={() => handleItemRemoval(index)}
                 >
-                  <MaterialIcons name="delete" size={24} color={colors.primary} />
+                  <Text style={styles.deleteIcon}>🗑️</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -256,6 +281,19 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#4CAF50',
     marginBottom: 20,
+  },
+  iconText: {
+    fontSize: 24,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  checkIcon: {
+    fontSize: 18,
+    color: '#4CAF50', // your primary color
+  },
+  deleteIcon: {
+    fontSize: 20,
+    color: '#4CAF50', // your primary color
   },
   selectedMealsCard: {
     backgroundColor: '#4CAF50',

@@ -1,70 +1,94 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
-from rest_framework.decorators import action, permission_classes
+from rest_framework.decorators import action, permission_classes, api_view
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate, logout
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import UserProfile, MealPlan, Meal, ShoppingList, ShoppingListItem
 from .serializers import (UserProfileSerializer, MealPlanSerializer, 
                         MealSerializer, ShoppingListSerializer, 
                         ShoppingListItemSerializer, UserSerializer)
+from django.db import transaction
 
-class RegistrationView(APIView):
-    permission_classes = [permissions.AllowAny]
-
-    def post(self, request):
-        serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            # Create a UserProfile instance for the new user
-            UserProfile.objects.create(user=user)
-            token, _ = Token.objects.get_or_create(user=user)
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def register_view(request):
+    serializer = UserSerializer(data=request.data)
+    if serializer.is_valid():
+        try:
+            with transaction.atomic():
+                # Create the user
+                user = serializer.save()
+                # UserProfile is automatically created via signal
+                
+                # Create auth token
+                token = Token.objects.create(user=user)
+                
+                return Response({
+                    'token': token.key,
+                    'user_id': user.id,
+                    'email': user.email,
+                    'username': user.username
+                }, status=status.HTTP_201_CREATED)
+        except Exception as e:
             return Response({
-                'token': token.key,
-                'user_id': user.id,
-                'email': user.email
-            }, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                'error': str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class LoginView(APIView):
-    permission_classes = [permissions.AllowAny]
-
-    def post(self, request):
-        email = request.data.get('email')
-        password = request.data.get('password')
-        user = authenticate(username=email, password=password)
-        
-        if user:
-            token, _ = Token.objects.get_or_create(user=user)
-            return Response({
-                'token': token.key,
-                'user_id': user.id,
-                'email': user.email
-            })
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def login_view(request):
+    email = request.data.get('email')
+    password = request.data.get('password')
+    
+    if email is None or password is None:
+        return Response({
+            'error': 'Please provide both email and password'
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    user = authenticate(username=email, password=password)
+    
+    if not user:
         return Response({
             'error': 'Invalid credentials'
         }, status=status.HTTP_401_UNAUTHORIZED)
+    
+    token, _ = Token.objects.get_or_create(user=user)
+    
+    return Response({
+        'token': token.key,
+        'user_id': user.pk,
+        'email': user.email
+    })
 
-class LogoutView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-
-    def post(self, request):
-        try:
-            # Delete the user's token
-            request.user.auth_token.delete()
-            # Logout the user
-            logout(request)
-            return Response({'message': 'Successfully logged out'}, 
-                          status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({'error': str(e)}, 
-                          status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def logout_view(request):
+    try:
+        # Delete the user's token
+        request.auth.delete()
+        return Response({'message': 'Successfully logged out'})
+    except Exception as e:
+        return Response({'error': str(e)}, 
+                      status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     serializer_class = UserProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
 
     def get_queryset(self):
         return UserProfile.objects.filter(user=self.request.user)
@@ -121,6 +145,13 @@ class ShoppingListViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def create(self, request):
+        serializer = ShoppingListItemSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     @action(detail=True, methods=['post'])
     def toggle_item(self, request, pk=None):
         shopping_list = self.get_object()
@@ -146,6 +177,20 @@ class ShoppingListViewSet(viewsets.ModelViewSet):
             is_checked=True
         ).delete()
         return Response({'status': 'completed items cleared'})
+
+    def add_items_from_meal(self, request, *args, **kwargs):
+        items = request.data
+        serializer = ShoppingListItemSerializer(data=items, many=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get_urls(self):
+        # Existing URLs
+        return super().get_urls() + [
+            path('shopping-list/<int:list_id>/update_from_meal_plan/', self.add_items_from_meal, name='shopping-list-update-from-meal-plan'),
+        ]
 
     @action(detail=True, methods=['post'])
     def update_from_meal_plan(self, request, pk=None):

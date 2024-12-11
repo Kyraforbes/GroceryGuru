@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-// Use your EC2 instance's public IP or domain
 const API_URL = process.env.EXPO_PUBLIC_API_URL || `http://${process.env.EXPO_PUBLIC_PUBLIC_IP}:8000/api`;
 
 const api = axios.create({
@@ -10,25 +9,60 @@ const api = axios.create({
     },
 });
 
-// Add token handling
-api.interceptors.request.use(
-    async (config) => {
-        const token = await AsyncStorage.getItem('userToken');
-        if (token) {
-            config.headers.Authorization = `Token ${token}`;
-        }
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
+// Authentication token handling
+export const setAuthToken = (token) => {
+    if (token) {
+        api.defaults.headers.common['Authorization'] = `Token ${token}`;
+    } else {
+        delete api.defaults.headers.common['Authorization'];
     }
-);
+};
 
 // Auth services
 export const authService = {
-    login: (credentials) => api.post('/login/', credentials),
-    register: (userData) => api.post('/register/', userData),
-    logout: () => api.post('/logout/'),
+    register: async (userData) => {
+        try {
+            // Log the request data for debugging
+            console.log('Sending registration request with data:', userData);
+            
+            const response = await api.post('/register/', {
+                username: userData.username,
+                email: userData.email,
+                password: userData.password
+            });
+            
+            console.log('Registration response:', response.data);
+            return response;
+        } catch (error) {
+            console.error('Registration error details:', error.response?.data);
+            throw error;
+        }
+    },
+
+    login: async (credentials) => {
+        try {
+            const response = await api.post('/login/', credentials);
+            if (response.data.token) {
+                setAuthToken(response.data.token);
+            }
+            return response;
+        } catch (error) {
+            console.error('Login error:', error);
+            throw error;
+        }
+    },
+
+    logout: async () => {
+        try {
+            await api.post('/logout/');
+            setAuthToken(null);
+        } catch (error) {
+            console.error('Logout error:', error);
+            // Clear token even if logout fails
+            setAuthToken(null);
+            throw error;
+        }
+    }
 };
 
 // Profile services
@@ -40,30 +74,14 @@ export const profileService = {
 // Shopping list services
 export const shoppingListService = {
     getList: () => api.get('/shopping-list/'),
-    addItem: (listId, item) => api.post(`/shopping-list/${listId}/add_item/`, item),
-    toggleItem: (listId, itemId) => api.post(`/shopping-list/${listId}/toggle_item/`, { item_id: itemId }),
-    removeItem: (listId, itemId) => api.delete(`/shopping-list/${listId}/items/${itemId}/`),
-    clearCompleted: (listId) => api.post(`/shopping-list/${listId}/clear_completed/`),
-    updateFromMealPlan: (listId, mealPlanId) => api.post(`/shopping-list/${listId}/update_from_meal_plan/`, { meal_plan_id: mealPlanId }),
-};
-
-// Meal plan services
-export const mealPlanService = {
-    getMealPlans: () => api.get('/meal-plans/'),
-    createMealPlan: (data) => api.post('/meal-plans/', data),
-    updateMealPlan: (id, data) => api.put(`/meal-plans/${id}/`, data),
-    deleteMealPlan: (id) => api.delete(`/meal-plans/${id}/`),
-    addMeal: (mealPlanId, mealData) => api.post(`/meal-plans/${mealPlanId}/add_meal/`, mealData),
-    removeMeal: (mealPlanId, mealId) => api.delete(`/meal-plans/${mealPlanId}/meals/${mealId}/`),
-};
-
-// Meal services
-export const mealService = {
-    getMeals: () => api.get('/meals/'),
-    getMealById: (id) => api.get(`/meals/${id}/`),
-    createMeal: (data) => api.post('/meals/', data),
-    updateMeal: (id, data) => api.put(`/meals/${id}/`, data),
-    deleteMeal: (id) => api.delete(`/meals/${id}/`),
+    addItem: (item) => api.post('/shopping-list/add_item/', item),
+    toggleItem: (itemId) => api.post('/shopping-list/toggle_item/', { item_id: itemId }),
+    removeItem: (itemId) => api.delete(`/shopping-list/items/${itemId}/`),
+    clearCompleted: () => api.post('/shopping-list/clear_completed/'),
+    addItemsFromMeal: (items) => api.post('/shopping-list/update_from_meal_plan/', items),
+    updateFromMealPlan: (mealPlanId) => api.post('/shopping-list/update_from_meal_plan/', {
+        meal_plan_id: mealPlanId
+    }),
 };
 
 // Error handling interceptor
@@ -71,8 +89,8 @@ api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            // Handle unauthorized error (e.g., clear token and redirect to login)
-            AsyncStorage.removeItem('userToken');
+            // Handle unauthorized error
+            setAuthToken(null);
         }
         return Promise.reject(error);
     }

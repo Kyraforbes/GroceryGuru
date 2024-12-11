@@ -19,10 +19,21 @@ class UserProfile(models.Model):
         ('monthly', 'Monthly'),
     ]
 
+    EATING_OUT_FREQUENCY_CHOICES = [
+        ('1_per_week', '1 time per week'),
+        ('2_per_week', '2 times per week'),
+        ('3_per_week', '3 times per week'),
+        ('4_plus_per_week', '4 or more times per week'),
+    ]
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     age_group = models.CharField(max_length=20, choices=AGE_GROUP_CHOICES, blank=True)
     shopping_frequency = models.CharField(max_length=20, choices=FREQUENCY_CHOICES, blank=True)
-    eating_out_frequency = models.CharField(max_length=20, choices=FREQUENCY_CHOICES, blank=True)
+    eating_out_frequency = models.CharField(
+        max_length=20, 
+        choices=EATING_OUT_FREQUENCY_CHOICES,
+        blank=True  # Make this field optional initially
+    )
     allergies = models.TextField(blank=True)
     other_preferences = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
