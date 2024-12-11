@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, ActivityIndicator, Picker } from 'react-native';
 import RecipeCard from '../components/RecipeCard';
 import { colors } from '../constants/colors';
+import { TouchableOpacity } from 'react-native';
 
 export default function MyMeals() {
   const [expanded, setExpanded] = useState({
@@ -10,7 +11,8 @@ export default function MyMeals() {
     Dinners: false,
     Desserts: false,
   });
-  const [recipes, setRecipes] = useState({
+  const [recipes, setRecipes] = useState([]);
+  const [categoryMeals, setCategoryMeals] = useState({
     Breakfasts: [],
     Lunches: [],
     Dinners: [],
@@ -18,24 +20,16 @@ export default function MyMeals() {
   });
   const [loading, setLoading] = useState(true);
 
-  // Fetch 2 random meals for each category
   const fetchRecipes = async () => {
     try {
-      const mealPromises = Array.from({ length: 8 }).map(() =>
+      setLoading(true);
+      const mealPromises = Array.from({ length: 20 }).map(() =>
         fetch('https://www.themealdb.com/api/json/v1/1/random.php').then((res) => res.json())
       );
       const meals = await Promise.all(mealPromises);
-
-      // Organize meals into categories
       const randomMeals = meals.map((meal) => meal.meals[0]);
-      const newRecipes = {
-        Breakfasts: randomMeals.slice(0, 2),
-        Lunches: randomMeals.slice(2, 4),
-        Dinners: randomMeals.slice(4, 6),
-        Desserts: randomMeals.slice(6, 8),
-      };
 
-      setRecipes(newRecipes);
+      setRecipes(randomMeals);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching recipes:', error);
@@ -54,6 +48,13 @@ export default function MyMeals() {
     }));
   };
 
+  const addMealToCategory = (meal, category) => {
+    setCategoryMeals((prev) => ({
+      ...prev,
+      [category]: [...prev[category], meal],
+    }));
+  };
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -69,9 +70,9 @@ export default function MyMeals() {
         <Text style={styles.headerText}>My Meals</Text>
       </View>
 
-      {/* Dropdown Categories */}
+      {/* Accordion Categories */}
       <View style={styles.categories}>
-        {Object.keys(recipes).map((category) => (
+        {Object.keys(categoryMeals).map((category) => (
           <View key={category} style={styles.category}>
             <TouchableOpacity
               style={[styles.categoryButton, expanded[category] && styles.categoryButtonActive]}
@@ -87,7 +88,7 @@ export default function MyMeals() {
 
             {expanded[category] && (
               <View style={styles.recipeList}>
-                {recipes[category].map((recipe, index) => (
+                {categoryMeals[category].map((recipe, index) => (
                   <RecipeCard
                     key={index}
                     title={recipe.strMeal}
@@ -96,6 +97,33 @@ export default function MyMeals() {
                 ))}
               </View>
             )}
+          </View>
+        ))}
+      </View>
+
+      {/* List of all meals */}
+      <View style={styles.allMealsContainer}>
+        <View style={styles.sectionHeaderContainer}>
+          <Text style={styles.sectionHeader}>All Meals</Text>
+          <TouchableOpacity style={styles.refreshButton} onPress={fetchRecipes}>
+            <Text style={styles.refreshButtonText}>Refresh Meal Suggestions</Text>
+          </TouchableOpacity>
+        </View>
+        {recipes.map((recipe, index) => (
+          <View key={index} style={styles.mealContainer}>
+            <RecipeCard title={recipe.strMeal} imageUrl={recipe.strMealThumb} />
+            <Picker
+              style={styles.dropdown}
+              selectedValue={''}
+              onValueChange={(value) => {
+                if (value) addMealToCategory(recipe, value);
+              }}
+            >
+              <Picker.Item label="Add to Category" value="" />
+              {Object.keys(categoryMeals).map((category) => (
+                <Picker.Item key={category} label={category} value={category} />
+              ))}
+            </Picker>
           </View>
         ))}
       </View>
@@ -118,6 +146,42 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: colors.white,
+  },
+  sectionHeaderContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  sectionHeader: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: colors.primary,
+  },
+  refreshButton: {
+    backgroundColor: colors.primary,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+  },
+  refreshButtonText: {
+    color: colors.white,
+    fontWeight: 'bold',
+  },
+  allMealsContainer: {
+    marginBottom: 20,
+  },
+  mealContainer: {
+    marginBottom: 20,
+    alignItems: 'center',
+  },
+  dropdown: {
+    marginTop: 10,
+    width: '90%',
+    maxWidth: 300,
+    backgroundColor: colors.primaryLight,
+    color: colors.text,
+    borderRadius: 10,
   },
   categories: {
     padding: 20,
