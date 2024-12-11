@@ -7,6 +7,8 @@ from django.contrib.auth import authenticate, logout
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from django.urls import path
+from django.core.exceptions import ObjectDoesNotExist
 from .models import UserProfile, MealPlan, Meal, ShoppingList, ShoppingListItem
 from .serializers import (UserProfileSerializer, MealPlanSerializer, 
                         MealSerializer, ShoppingListSerializer, 
@@ -20,11 +22,7 @@ def register_view(request):
     if serializer.is_valid():
         try:
             with transaction.atomic():
-                # Create the user
                 user = serializer.save()
-                # UserProfile is automatically created via signal
-                
-                # Create auth token
                 token = Token.objects.create(user=user)
                 
                 return Response({
@@ -45,31 +43,41 @@ def login_view(request):
     email = request.data.get('email')
     password = request.data.get('password')
     
-    if email is None or password is None:
+    if not email or not password:
         return Response({
             'error': 'Please provide both email and password'
         }, status=status.HTTP_400_BAD_REQUEST)
     
-    user = authenticate(username=email, password=password)
-    
-    if not user:
+    try:
+        user = User.objects.get(email=email)
+        auth_user = authenticate(username=user.username, password=password)
+        
+        if auth_user:
+            token, _ = Token.objects.get_or_create(user=auth_user)
+            return Response({
+                'token': token.key,
+                'user_id': auth_user.id,
+                'email': auth_user.email,
+                'username': auth_user.username
+            })
+        else:
+            return Response({
+                'error': 'Invalid credentials'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+            
+    except ObjectDoesNotExist:
         return Response({
-            'error': 'Invalid credentials'
-        }, status=status.HTTP_401_UNAUTHORIZED)
-    
-    token, _ = Token.objects.get_or_create(user=user)
-    
-    return Response({
-        'token': token.key,
-        'user_id': user.pk,
-        'email': user.email
-    })
+            'error': 'No account found with this email'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def logout_view(request):
     try:
-        # Delete the user's token
         request.auth.delete()
         return Response({'message': 'Successfully logged out'})
     except Exception as e:
@@ -80,15 +88,6 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     serializer_class = UserProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
     queryset = UserProfile.objects.all()
-    serializer_class = UserProfileSerializer
-
-    def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        return Response(serializer.data)
 
     def get_queryset(self):
         return UserProfile.objects.filter(user=self.request.user)
@@ -145,13 +144,6 @@ class ShoppingListViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def create(self, request):
-        serializer = ShoppingListItemSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
     @action(detail=True, methods=['post'])
     def toggle_item(self, request, pk=None):
         shopping_list = self.get_object()
@@ -178,46 +170,22 @@ class ShoppingListViewSet(viewsets.ModelViewSet):
         ).delete()
         return Response({'status': 'completed items cleared'})
 
-    def add_items_from_meal(self, request, *args, **kwargs):
-        items = request.data
-        serializer = ShoppingListItemSerializer(data=items, many=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def get_urls(self):
-        # Existing URLs
-        return super().get_urls() + [
-            path('shopping-list/<int:list_id>/update_from_meal_plan/', self.add_items_from_meal, name='shopping-list-update-from-meal-plan'),
-        ]
-
     @action(detail=True, methods=['post'])
     def update_from_meal_plan(self, request, pk=None):
         try:
             shopping_list = self.get_object()
             meal_plan_id = request.data.get('meal_plan_id')
             
-            # Verify meal plan exists and belongs to user
             meal_plan = get_object_or_404(MealPlan, id=meal_plan_id, user=self.request.user)
-            
-            # Get all meals from the meal plan
             meals = Meal.objects.filter(meal_plan=meal_plan)
-            
-            # Track added items to avoid duplicates
             added_items = set()
             
             for meal in meals:
-                # Assuming each meal has ingredients stored in JSON format
-                # Format example: [{"item": "Tomatoes", "quantity": "2"}, ...]
                 ingredients = meal.ingredients
-                
                 for ingredient in ingredients:
                     item_text = f"{ingredient['quantity']} {ingredient['item']}"
                     
-                    # Check if this item is already in our added items set
                     if item_text not in added_items:
-                        # Create new shopping list item
                         ShoppingListItem.objects.create(
                             shopping_list=shopping_list,
                             text=item_text,
@@ -225,7 +193,6 @@ class ShoppingListViewSet(viewsets.ModelViewSet):
                         )
                         added_items.add(item_text)
             
-            # Update the shopping list's meal plan reference
             shopping_list.meal_plan = meal_plan
             shopping_list.save()
             

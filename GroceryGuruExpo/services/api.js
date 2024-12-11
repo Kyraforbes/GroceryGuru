@@ -22,8 +22,10 @@ export const setAuthToken = (token) => {
 export const authService = {
     register: async (userData) => {
         try {
-            // Log the request data for debugging
-            console.log('Sending registration request with data:', userData);
+            console.log('Sending registration request with data:', {
+                ...userData,
+                password: '[HIDDEN]'
+            });
             
             const response = await api.post('/register/', {
                 username: userData.username,
@@ -31,7 +33,14 @@ export const authService = {
                 password: userData.password
             });
             
-            console.log('Registration response:', response.data);
+            if (response.data.token) {
+                setAuthToken(response.data.token);
+            }
+            
+            console.log('Registration response:', {
+                ...response.data,
+                token: '[HIDDEN]'
+            });
             return response;
         } catch (error) {
             console.error('Registration error details:', error.response?.data);
@@ -41,13 +50,17 @@ export const authService = {
 
     login: async (credentials) => {
         try {
-            const response = await api.post('/login/', credentials);
+            const response = await api.post('/login/', {
+                email: credentials.email,
+                password: credentials.password
+            });
+            
             if (response.data.token) {
                 setAuthToken(response.data.token);
             }
             return response;
         } catch (error) {
-            console.error('Login error:', error);
+            console.error('Login error:', error.response?.data);
             throw error;
         }
     },
@@ -68,20 +81,34 @@ export const authService = {
 // Profile services
 export const profileService = {
     getProfile: () => api.get('/profile/'),
-    updateProfile: (data) => api.put('/profile/', data),
+    updateProfile: (data) => api.put('/profile/', data)
 };
 
 // Shopping list services
 export const shoppingListService = {
     getList: () => api.get('/shopping-list/'),
     addItem: (item) => api.post('/shopping-list/add_item/', item),
-    toggleItem: (itemId) => api.post('/shopping-list/toggle_item/', { item_id: itemId }),
+    toggleItem: (itemId) => api.post('/shopping-list/toggle_item/', { 
+        item_id: itemId 
+    }),
     removeItem: (itemId) => api.delete(`/shopping-list/items/${itemId}/`),
     clearCompleted: () => api.post('/shopping-list/clear_completed/'),
     addItemsFromMeal: (items) => api.post('/shopping-list/update_from_meal_plan/', items),
     updateFromMealPlan: (mealPlanId) => api.post('/shopping-list/update_from_meal_plan/', {
         meal_plan_id: mealPlanId
-    }),
+    })
+};
+
+// Meal plan services
+export const mealPlanService = {
+    getMealPlans: () => api.get('/meal-plans/'),
+    createMealPlan: (data) => api.post('/meal-plans/', data),
+    updateMealPlan: (id, data) => api.put(`/meal-plans/${id}/`, data),
+    deleteMealPlan: (id) => api.delete(`/meal-plans/${id}/`),
+    addMeal: (mealPlanId, mealData) => api.post(`/meal-plans/${mealPlanId}/add_meal/`, mealData),
+    removeMeal: (mealPlanId, mealId) => api.delete(`/meal-plans/${mealPlanId}/remove_meal/`, {
+        data: { meal_id: mealId }
+    })
 };
 
 // Error handling interceptor
